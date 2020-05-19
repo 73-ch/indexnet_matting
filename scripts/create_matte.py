@@ -81,9 +81,9 @@ def image_alignment(x, output_stride, odd=False):
 
     return new_x
 
-def inference(image_path, trimap_path):
+def inference(image, trimap):
     with torch.no_grad():
-        image, trimap = read_image(image_path), read_image(trimap_path)
+        # image, trimap = read_image(image_path), read_image(trimap_path)
         trimap = np.expand_dims(trimap, axis=2)
         image = np.concatenate((image, trimap), axis=2)
         
@@ -109,12 +109,9 @@ def inference(image_path, trimap_path):
         mask = np.equal(trimap, 128).astype(np.float32)
         alpha = (1 - mask) * trimap + mask * alpha
 
-        _, image_name = os.path.split(image_path)
-        Image.fromarray(alpha.astype(np.uint8)).save(os.path.join(RESULT_DIR, image_name))
-        # Image.fromarray(alpha.astype(np.uint8)).show()
-
         running_frame_rate = 1 * float(1 / (end - start)) # batch_size = 1
         print('framerate: {0:.2f}Hz'.format(running_frame_rate))
+        return alpha.astype(np.uint8)
 
 
 if __name__ == "__main__":
