@@ -14,19 +14,25 @@ if __name__ == "__main__":
     bg = np.full_like(frame, 255., dtype=float)
     # bg = bg.astype(float)
 
+    t = time() * 1000.
+
     while True:
         ret, frame = cap.read()
 
         if not ret:
             continue
-
+        t1 = time() * 1000.
         removed = removal_background(frame, bg)
-
+        t2 = time() * 1000.
+        print("ps: ", t2-t1)
         # cv2.imwrite("./examples/outs/{}.png".format(i), removed)
 
         removed = removed.astype(np.uint8)
 
         cv2.imshow("removal_background", removed)
+
+        print(time()*1000. - t)
+        t = time() * 1000.
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

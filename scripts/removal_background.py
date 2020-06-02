@@ -128,7 +128,7 @@ def inference(image, trimap):
         alpha = (1 - mask) * trimap + mask * alpha
 
         running_frame_rate = 1 * float(1 / (end - start))  # batch_size = 1
-        # print('framerate: {0:.2f}Hz'.format(running_frame_rate))
+        # print('framerate: {0:.2f}Hz'.format((end - start)*1000.))
         return alpha.astype(np.uint8)
 
 
@@ -160,9 +160,9 @@ def removal_background(input_img, bg):
     mask = output.byte().cpu().numpy()
     mask = cv2.resize(mask, (w, h))
     ret, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
-    t3 = time() * 1000.
-    trimap = gen_trimap(mask, k_size=(10, 10), ite=5)
 
+    trimap = gen_trimap(mask, k_size=(10, 10), ite=5)
+    t3 = time() * 1000.
     # cv2.imwrite('./examples/trimaps/63.png',trimap) # trimapの書き出し
 
     # indexnet_mattingの呼び出し
@@ -179,8 +179,11 @@ def removal_background(input_img, bg):
     bg_removed = cv2.multiply(bg, 1.0 - matte)  # 10~20ms
     t5 = time() * 1000.
 
-    print("{}, {}, {}, {}".format(t2 - t1, t3 - t2, t4 - t4, t5 - t4))
-    return cv2.add(original, bg_removed)
+    out =  cv2.add(original, bg_removed)
+
+    t6 = time() * 1000.
+    # print("{}, {}, {}, {} {} {}".format(t2 - t1, t3 - t2, t4 - t3, t5 - t4, t6 - t5, t6-t1))
+    return out
 
 
 if __name__ == "__main__":
